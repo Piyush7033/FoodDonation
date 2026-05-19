@@ -1,0 +1,172 @@
+/* ================= HOME PAGE (FULL SCREEN FIXED UI) ================= */
+
+.home-container {
+  font-family: "Poppins", sans-serif;
+  color: white;
+  background: radial-gradient(circle at top, #0f172a, #1e3a8a, #020617);
+
+  height: 100vh;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* ================= HERO ================= */
+
+.hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+  padding: 10px;
+  position: relative;
+}
+
+.hero h1 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+
+  background: linear-gradient(90deg, #22c55e, #60a5fa);
+
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+  max-width: 600px;
+  font-size: 0.95rem;
+  opacity: 0.85;
+  line-height: 1.4;
+}
+
+/* glow */
+.hero::before,
+.hero::after {
+  content: "";
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  filter: blur(90px);
+  border-radius: 50%;
+}
+
+.hero::before {
+  background: rgba(34, 197, 94, 0.15);
+  top: 10%;
+  left: 10%;
+}
+
+.hero::after {
+  background: rgba(59, 130, 246, 0.15);
+  bottom: 10%;
+  right: 10%;
+}
+
+/* ================= BUTTONS ================= */
+
+.hero-buttons {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+}
+
+.secondary-btn {
+  background: rgba(255,255,255,0.08);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+/* ================= ROLE ================= */
+
+.role-section {
+  text-align: center;
+  padding: 5px;
+}
+
+.role-section h2 {
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+
+.role-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.role-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  color: white;
+}
+
+
+.role-btn.donor {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.role-btn.receiver {
+  background: linear-gradient(135deg, #f43f5e, #60a5fa);
+}
+
+.role-btn:hover {
+  transform: scale(1.05);
+}
+
+/* ================= FEATURES ================= */
+
+.features-section {
+  text-align: center;
+  padding: 5px;
+}
+
+.features-section h2 {
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+
+.features-grid {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.feature-card {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+
+  padding: 10px;
+  border-radius: 10px;
+
+  width: 200px;
+  font-size: 0.8rem;
+
+  backdrop-filter: blur(10px);
+}

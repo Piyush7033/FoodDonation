@@ -1,0 +1,84 @@
+/* =========================
+   PAGE TITLE
+========================= */
+
+.receiver-page-title {
+
+  font-size: 32px;
+
+  color: #198754;
+
+  margin-bottom: 25px;
+}
+
+/* =========================
+   TABLE CONTAINER
+========================= */
+
+.receiver-table-container {
+
+  overflow-x: auto;
+
+  background-color: white;
+
+  padding: 20px;
+
+  border-radius: 10px;
+
+  box-shadow: 0px 2px 10px rgba(0,0,0,0.1);
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.receiver-table {
+
+  width: 100%;
+
+  border-collapse: collapse;
+}
+
+.receiver-table th {
+
+  background-color: #198754;
+
+  color: white;
+
+  padding: 15px;
+
+  text-align: left;
+}
+
+.receiver-table td {
+
+  padding: 15px;
+
+  border-bottom: 1px solid #ddd;
+}
+
+.receiver-table tr:hover {
+
+  background-color: #f5f5f5;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media screen and (max-width: 768px) {
+
+  .receiver-page-title {
+
+    font-size: 26px;
+  }
+
+  .receiver-table th,
+  .receiver-table td {
+
+    padding: 10px;
+
+    font-size: 14px;
+  }
+
+}

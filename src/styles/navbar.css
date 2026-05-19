@@ -1,0 +1,70 @@
+/* ================= NAVBAR ================= */
+
+.navbar {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  padding: 12px 0;
+}
+
+.navbar-container {
+  width: 92%;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #60a5fa;
+  text-decoration: none;
+  letter-spacing: 1px;
+  transition: 0.3s;
+}
+
+.navbar-logo:hover {
+  transform: scale(1.05);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 10px;
+  transition: 0.3s;
+  font-weight: 500;
+  background: rgba(255,255,255,0.05);
+}
+
+.nav-link:hover {
+  background: rgba(96,165,250,0.2);
+  transform: translateY(-2px);
+}
+
+.logout-btn {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(239,68,68,0.3);
+}
