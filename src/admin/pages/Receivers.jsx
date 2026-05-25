@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-import Sidebar from '../components/Sidebar';
-import Navbar from '../components/Navbar';
+import Sidebar from "../components/Sidebar";
+import Navbar from "../components/Navbar";
+import { Users, ShieldCheck, Activity, Package } from 'lucide-react';
 
-import api from '../../services/api';
+import api from "../../services/api";
 
-import './Receivers.css';
+import "./Receivers.css";
 
 const Receivers = () => {
 
@@ -26,6 +27,13 @@ const Receivers = () => {
   const [error, setError] = useState("");
 
   // =========================================
+  // COMMON TOKEN
+  // =========================================
+
+  const token =
+    localStorage.getItem("token");
+
+  // =========================================
   // FETCH RECEIVERS
   // =========================================
 
@@ -35,15 +43,14 @@ const Receivers = () => {
 
       setLoading(true);
 
-      const token =
-        localStorage.getItem("authToken");
+      setError("");
 
       const response = await api.get(
         "/admin/receivers",
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -73,7 +80,7 @@ const Receivers = () => {
   };
 
   // =========================================
-  // FETCH ALL REQUESTS
+  // FETCH RECEIVER REQUESTS
   // =========================================
 
   const fetchReceiverRequests = async () => {
@@ -84,16 +91,12 @@ const Receivers = () => {
 
       setError("");
 
-      const token =
-        localStorage.getItem("authToken");
-
-      // ✅ CORRECT API
       const response = await api.get(
         "/request/all",
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -142,17 +145,21 @@ const Receivers = () => {
 
   const deleteReceiver = async (id) => {
 
-    try {
+    const confirmDelete =
+      window.confirm(
+        "Are you sure you want to delete this receiver?"
+      );
 
-      const token =
-        localStorage.getItem("authToken");
+    if (!confirmDelete) return;
+
+    try {
 
       await api.delete(
         `/admin/users/${id}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -160,6 +167,7 @@ const Receivers = () => {
         "Receiver deleted successfully"
       );
 
+      // REFRESH RECEIVERS
       fetchReceivers();
 
     } catch (error) {
@@ -184,16 +192,13 @@ const Receivers = () => {
 
     try {
 
-      const token =
-        localStorage.getItem("authToken");
-
       const response = await api.put(
         `/request/${id}/accept`,
         {},
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -202,9 +207,11 @@ const Receivers = () => {
         response.data
       );
 
-      alert("Request accepted successfully");
+      alert(
+        "Request accepted successfully"
+      );
 
-      // REFRESH TABLE
+      // REFRESH REQUESTS
       fetchReceiverRequests();
 
     } catch (error) {
@@ -229,16 +236,13 @@ const Receivers = () => {
 
     try {
 
-      const token =
-        localStorage.getItem("authToken");
-
       const response = await api.put(
         `/request/${id}/reject`,
         {},
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -247,9 +251,11 @@ const Receivers = () => {
         response.data
       );
 
-      alert("Request rejected successfully");
+      alert(
+        "Request rejected successfully"
+      );
 
-      // REFRESH TABLE
+      // REFRESH REQUESTS
       fetchReceiverRequests();
 
     } catch (error) {
@@ -264,6 +270,13 @@ const Receivers = () => {
         "Failed to reject request"
       );
     }
+  };
+
+  const summary = {
+    totalReceivers: receivers.length,
+    activeReceivers: receivers.filter((item) => item.active).length,
+    disabledReceivers: receivers.filter((item) => !item.active).length,
+    pendingRequests: receiverRequests.filter((item) => item.status === 'REQUESTED').length,
   };
 
   return (
@@ -282,13 +295,63 @@ const Receivers = () => {
         {/* CONTENT */}
         <div className="admin-content">
 
-          {/* ===================================== */}
-          {/* RECEIVER SECTION */}
-          {/* ===================================== */}
+          <div className="receiver-hero">
+            <div className="hero-copy">
+              <p className="eyebrow">Receiver Management</p>
+              <h1 className="receiver-page-title">All Receivers</h1>
+              <p className="receiver-page-description">
+                Monitor active receiver accounts, manage user status, and review pending food requests in a single easy admin view.
+              </p>
+            </div>
+            <div className="summary-grid">
+              <div className="summary-card">
+                <div className="summary-icon blue">
+                  <Users size={20} />
+                </div>
+                <div>
+                  <p className="summary-label">Total Receivers</p>
+                  <h2>{summary.totalReceivers}</h2>
+                </div>
+              </div>
+              <div className="summary-card">
+                <div className="summary-icon teal">
+                  <ShieldCheck size={20} />
+                </div>
+                <div>
+                  <p className="summary-label">Active Receivers</p>
+                  <h2>{summary.activeReceivers}</h2>
+                </div>
+              </div>
+              <div className="summary-card">
+                <div className="summary-icon cyan">
+                  <Package size={20} />
+                </div>
+                <div>
+                  <p className="summary-label">Disabled Receivers</p>
+                  <h2>{summary.disabledReceivers}</h2>
+                </div>
+              </div>
+              <div className="summary-card">
+                <div className="summary-icon navy">
+                  <Activity size={20} />
+                </div>
+                <div>
+                  <p className="summary-label">Pending Requests</p>
+                  <h2>{summary.pendingRequests}</h2>
+                </div>
+              </div>
+            </div>
+          </div>
 
-          <h1 className="receiver-page-title">
-            All Receivers
-          </h1>
+          <div className="section-block">
+            <div className="section-header">
+              <div>
+                <h2>Registered Receivers</h2>
+                <p className="section-description">
+                  View receiver contact details and manage account status with fast admin actions.
+                </p>
+              </div>
+            </div>
 
           {loading ? (
 
@@ -332,11 +395,11 @@ const Receivers = () => {
                         </td>
 
                         <td>
-                          {receiver.email}
+                          {receiver.email || "N/A"}
                         </td>
 
                         <td>
-                          {receiver.role}
+                          {receiver.role || "N/A"}
                         </td>
 
                         <td>
@@ -392,13 +455,22 @@ const Receivers = () => {
 
           )}
 
+          </div>
+
           {/* ===================================== */}
           {/* REQUEST SECTION */}
           {/* ===================================== */}
 
-          <h1 className="receiver-page-title mt-5">
-            Receiver Food Requests
-          </h1>
+          <div className="section-block">
+            <div className="section-header">
+              <div>
+                <h2>Receiver Food Requests</h2>
+                <p className="section-description">
+                  Review incoming food requests and manage approval workflow from the admin panel.
+                </p>
+              </div>
+            </div>
+          </div>
 
           {requestLoading && (
 
@@ -430,6 +502,8 @@ const Receivers = () => {
 
                     <th>Receiver Name</th>
 
+                    <th>Receiver Email</th>
+
                     <th>Food Title</th>
 
                     <th>Quantity</th>
@@ -455,24 +529,34 @@ const Receivers = () => {
                         {/* REQUEST ID */}
                         <td>{request.id}</td>
 
-                        {/* RECEIVER */}
+                        {/* RECEIVER NAME */}
                         <td>
-                          {request.receiver?.name || "N/A"}
+                          {request.receiver?.name ||
+                            "N/A"}
+                        </td>
+
+                        {/* RECEIVER EMAIL */}
+                        <td>
+                          {request.receiver?.email ||
+                            "N/A"}
                         </td>
 
                         {/* FOOD TITLE */}
                         <td>
-                          {request.food?.title || "N/A"}
+                          {request.food?.title ||
+                            "N/A"}
                         </td>
 
                         {/* QUANTITY */}
                         <td>
-                          {request.food?.quantity || "N/A"}
+                          {request.food?.quantity ||
+                            "N/A"}
                         </td>
 
                         {/* LOCATION */}
                         <td>
-                          {request.food?.location || "N/A"}
+                          {request.food?.location ||
+                            "N/A"}
                         </td>
 
                         {/* STATUS */}
@@ -480,9 +564,11 @@ const Receivers = () => {
 
                           <span
                             className={
-                              request.status === "APPROVED"
+                              request.status ===
+                              "APPROVED"
                                 ? "status-active"
-                                : request.status === "REJECTED"
+                                : request.status ===
+                                  "REJECTED"
                                 ? "status-disabled"
                                 : "status-pending"
                             }
@@ -495,13 +581,17 @@ const Receivers = () => {
                         {/* ACTION */}
                         <td>
 
-                          {request.status === "REQUESTED" && (
+                          {request.status ===
+                            "REQUESTED" && (
 
-                            <>
+                            <div className="request-action-buttons">
+
                               <button
                                 className="accept-btn"
                                 onClick={() =>
-                                  acceptRequest(request.id)
+                                  acceptRequest(
+                                    request.id
+                                  )
                                 }
                               >
                                 Accept
@@ -510,12 +600,15 @@ const Receivers = () => {
                               <button
                                 className="reject-btn"
                                 onClick={() =>
-                                  rejectRequest(request.id)
+                                  rejectRequest(
+                                    request.id
+                                  )
                                 }
                               >
                                 Reject
                               </button>
-                            </>
+
+                            </div>
 
                           )}
 
@@ -529,7 +622,7 @@ const Receivers = () => {
 
                     <tr>
 
-                      <td colSpan="7">
+                      <td colSpan="8">
                         No requests found
                       </td>
 

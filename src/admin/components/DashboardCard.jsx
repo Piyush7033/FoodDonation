@@ -1,8 +1,18 @@
-const DashboardCard = ({ title, count }) => {
+import React from "react";
+
+const DashboardCard = ({ title, count, Icon, note }) => {
   return (
-    <div className="bg-white shadow-md rounded-lg p-5 border">
-      <h2 className="text-gray-500 text-lg">{title}</h2>
-      <p className="text-3xl font-bold mt-2">{count}</p>
+    <div className="dashboard-card">
+      <div className="dashboard-card-header">
+        <div className="dashboard-card-icon-wrap">
+          {Icon ? <Icon size={20} strokeWidth={1.8} /> : null}
+        </div>
+        <span className="dashboard-card-label">{title}</span>
+      </div>
+
+      <p className="dashboard-card-value">{count ?? 0}</p>
+
+      {note && <p className="dashboard-card-note">{note}</p>}
     </div>
   );
 };

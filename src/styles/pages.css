@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
 /* ================= GLOBAL RESET ================= */
 
 * {
@@ -6,16 +8,24 @@
   box-sizing: border-box;
 }
 
+html {
+  font-family: 'Poppins', system-ui, sans-serif;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100%;
+  background: #eff6ff;
+  color: #0f172a;
+}
+
 /* ================= LOGIN PAGE ================= */
 
 .auth-container {
   display: flex;
   min-height: 100vh;
 
-  background:
-    radial-gradient(circle at top left, #1e3a8a, transparent 30%),
-    radial-gradient(circle at bottom right, #22c55e22, transparent 30%),
-    linear-gradient(135deg, #020617, #0f172a, #111827);
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 40%, #bfdbfe 100%);
 
   font-family: "Poppins", sans-serif;
   overflow: hidden;
@@ -30,7 +40,7 @@
   width: 500px;
   height: 500px;
 
-  background: rgba(59, 130, 246, 0.12);
+  background: rgba(59, 130, 246, 0.18);
 
   border-radius: 50%;
   filter: blur(120px);
@@ -48,7 +58,7 @@
   width: 400px;
   height: 400px;
 
-  background: rgba(34, 197, 94, 0.12);
+  background: rgba(59, 130, 246, 0.12);
 
   border-radius: 50%;
   filter: blur(120px);
@@ -94,6 +104,8 @@
 
   color: white;
   overflow: hidden;
+  background: linear-gradient(180deg, #2563eb 0%, #3b82f6 100%);
+  border-bottom-right-radius: 60px;
 }
 
 .left-content {
@@ -130,6 +142,49 @@
   color: #d1d5db;
 }
 
+.auth-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 1rem;
+  margin-bottom: 24px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #e5e7eb;
+  letter-spacing: 0.5px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.left-highlights {
+  display: grid;
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.highlight-card {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  padding: 18px;
+  color: #f8fafc;
+  backdrop-filter: blur(8px);
+}
+
+.highlight-card strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.highlight-card span {
+  display: block;
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
 /* image */
 .food-image {
   width: 100%;
@@ -158,7 +213,7 @@
   justify-content: center;
   align-items: center;
 
-  padding: 35px;
+  padding: 45px 32px;
 
   position: relative;
   z-index: 2;
@@ -168,43 +223,54 @@
 
 .auth-card {
   width: 100%;
-  max-width: 430px;
+  max-width: 450px;
 
-  padding: 35px;
+  padding: 42px;
 
-  border-radius: 26px;
+  border-radius: 30px;
 
-  background: rgba(255,255,255,0.08);
+  background: #ffffff;
 
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(37, 99, 235, 0.16);
 
   box-shadow:
-    0 20px 60px rgba(0,0,0,0.45);
+    0 24px 60px rgba(15, 23, 42, 0.12),
+    0 8px 26px rgba(37, 99, 235, 0.08);
 
   animation: fadeIn 0.7s ease;
 
-  color: white;
+  color: #0f172a;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 30px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,0.32), rgba(255,255,255,0.02));
+  opacity: 0.8;
 }
 
 /* title */
 .auth-title {
   font-size: 2rem;
   font-weight: 800;
-  text-align: center;
+  text-align: left;
 
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  color: #111827;
 }
 
 .auth-subtitle {
-  text-align: center;
-  opacity: 0.75;
+  text-align: left;
+  opacity: 0.85;
 
   margin-bottom: 24px;
 
-  color: #cbd5e1;
+  color: #475569;
 }
 
 /* ================= ROLE SELECT ================= */
@@ -219,7 +285,7 @@
   margin-bottom: 10px;
 
   text-align: center;
-  color: #d1d5db;
+  color: #64748b;
 }
 
 .role-buttons {
@@ -230,15 +296,15 @@
 .role-btn {
   flex: 1;
 
-  padding: 11px;
+  padding: 12px 16px;
 
   border-radius: 14px;
 
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid #93c5fd;
 
-  background: rgba(255,255,255,0.06);
+  background: #ffffff;
 
-  color: white;
+  color: #1d4ed8;
 
   cursor: pointer;
 
@@ -248,22 +314,16 @@
 }
 
 .role-btn:hover {
-  background: rgba(255,255,255,0.12);
-
+  background: #eff6ff;
   transform: translateY(-2px);
 }
 
 .role-btn.active {
-  background: linear-gradient(
-    135deg,
-    #22c55e,
-    #16a34a
-  );
-
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: #ffffff;
   border: none;
-
   box-shadow:
-    0 10px 25px rgba(34,197,94,0.4);
+    0 10px 25px rgba(59,130,246,0.25);
 }
 
 /* ================= FORM ================= */
@@ -274,9 +334,9 @@
 
 .form-group label {
   font-size: 0.92rem;
-  font-weight: 500;
+  font-weight: 600;
 
-  color: #f3f4f6;
+  color: #334155;
 }
 
 .form-group input {
@@ -288,11 +348,11 @@
 
   border-radius: 14px;
 
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid #cbd5e1;
 
-  background: rgba(255,255,255,0.07);
+  background: #f8fbff;
 
-  color: white;
+  color: #0f172a;
 
   outline: none;
 
@@ -304,12 +364,17 @@
 }
 
 .form-group input:focus {
-  border-color: #60a5fa;
+  border-color: #2563eb;
 
   box-shadow:
-    0 0 15px rgba(96,165,250,0.35);
+    0 0 15px rgba(37, 99, 235, 0.25);
 
-  background: rgba(255,255,255,0.1);
+  background: #ffffff;
+}
+
+.input-error {
+  border-color: #f87171;
+  box-shadow: 0 0 0 0.15rem rgba(248, 113, 113, 0.18);
 }
 
 /* ================= BUTTON ================= */
@@ -324,11 +389,7 @@
   border: none;
   border-radius: 15px;
 
-  background: linear-gradient(
-    135deg,
-    #22c55e,
-    #16a34a
-  );
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
 
   color: white;
 
@@ -344,7 +405,28 @@
   transform: translateY(-3px);
 
   box-shadow:
-    0 14px 35px rgba(34,197,94,0.4);
+    0 14px 35px rgba(59,130,246,0.4);
+}
+
+.auth-note {
+  margin-top: 16px;
+  font-size: 0.95rem;
+  color: #64748b;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.forgot-note {
+  margin-top: 8px;
+  font-size: 0.86rem;
+  color: #a5b4fc;
+}
+
+.error-text {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.86rem;
+  color: #f87171;
 }
 
 /* ================= FOOTER LINK ================= */
@@ -356,11 +438,11 @@
 
   font-size: 0.92rem;
 
-  color: #d1d5db;
+  color: #475569;
 }
 
 .auth-link a {
-  color: #60a5fa;
+  color: #2563eb;
 
   text-decoration: none;
   font-weight: 700;
@@ -409,12 +491,19 @@
     max-width: 320px;
   }
 
+  .login-left {
+    display: none;
+  }
+
   .login-right {
+    width: 100%;
     padding: 20px;
   }
 
   .auth-card {
     padding: 28px;
+    max-width: 100%;
+    border-radius: 24px;
   }
 
   .role-buttons {

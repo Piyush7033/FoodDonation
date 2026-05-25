@@ -1,272 +1,192 @@
 import React, { useEffect, useState } from "react";
 import API from "../../api/axios";
+import { useAuth } from "../../context/AuthContext";
+import "../../styles/donationHistory.css";
+
+// =========================================
+// STATUS CONFIG — matches FoodStatus enum
+// =========================================
+
+const STATUS_META = {
+  AVAILABLE: {
+    label: "Available",
+    badgeCls: "badge-available",
+    cardCls: "card-available",
+    icon: "",
+  },
+  REQUESTED: {
+    label: "Requested",
+    badgeCls: "badge-requested",
+    cardCls: "card-requested",
+    icon: "",
+  },
+  ACCEPTED: {
+    label: "Accepted",
+    badgeCls: "badge-accepted",
+    cardCls: "card-accepted",
+    icon: "",
+  },
+};
+
+const getStatusMeta = (status) =>
+  STATUS_META[status] ?? {
+    label: status ?? "Unknown",
+    badgeCls: "badge-unknown",
+    cardCls: "",
+    icon: "",
+  };
+
+// =========================================
+// COMPONENT
+// =========================================
 
 const DonationHistory = () => {
 
-  // =========================================
-  // STATES
-  // =========================================
+  const { user } = useAuth();
 
   const [donations, setDonations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState("");
+  const [filter, setFilter]       = useState("ALL");
 
   // =========================================
-  // LOAD DATA
+  // FETCH
   // =========================================
 
   useEffect(() => {
-
-    fetchDonationHistory();
-
-  }, []);
-
-  // =========================================
-  // FETCH DONATION HISTORY
-  // =========================================
+    if (user?.id) fetchDonationHistory();
+  }, [user]);
 
   const fetchDonationHistory = async () => {
-
     try {
-
       setLoading(true);
       setError("");
 
-      // =========================================
-      // GET TOKEN
-      // =========================================
-
-      const token =
-        localStorage.getItem("token");
-
-      console.log("🔑 TOKEN:", token);
-
-      // =========================================
-      // TOKEN CHECK
-      // =========================================
+      const token = localStorage.getItem("token");
 
       if (!token) {
-
-        setError(
-          "Authentication token not found"
-        );
-
+        setError("Authentication token not found. Please login again.");
         return;
       }
+      console.log("token: ", token);
 
-      // =========================================
-      // API REQUEST
-      // =========================================
+      const response = await API.get(`/donations/history/${user.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-      const response = await API.get(
-        "/donations/my",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
+      setDonations(Array.isArray(response.data) ? response.data : []);
 
-      console.log(
-        "📦 DONATION RESPONSE:",
-        response.data
-      );
-
-      // =========================================
-      // SAFE ARRAY CHECK
-      // =========================================
-
-      const donationData =
-        Array.isArray(response.data)
-          ? response.data
-          : [];
-
-      setDonations(donationData);
-
-    } catch (error) {
-
-      console.error(
-        "❌ Donation Error:",
-        error.response?.data || error.message
-      );
-
-      console.log(
-        "❌ Full Error:",
-        error.response
-      );
-
-      // =========================================
-      // ERROR HANDLING
-      // =========================================
-
-      if (error.response?.status === 401) {
-
-        setError(
-          "Unauthorized. Please login again."
-        );
-
-      } else if (
-        error.response?.status === 403
-      ) {
-
-        setError(
-          "Access denied."
-        );
-
-      } else if (
-        error.response?.status === 404
-      ) {
-
-        setError(
-          "API endpoint not found."
-        );
-
-      } else {
-
-        setError(
-          error.response?.data?.message ||
-          "Failed to load donations"
-        );
-      }
-
+    } catch (err) {
+      if (err.response?.status === 401)      setError("Unauthorized. Please login again.");
+      else if (err.response?.status === 403) setError("Access denied.");
+      else if (err.response?.status === 404) setError("No donation history found.");
+      else setError(err.response?.data?.message || "Failed to load donation history.");
     } finally {
-
       setLoading(false);
     }
   };
 
+  // =========================================
+  // FILTER + COUNTS
+  // =========================================
+
+  const counts = {
+    ALL:       donations.length,
+    AVAILABLE: donations.filter((d) => d.status === "AVAILABLE").length,
+    REQUESTED: donations.filter((d) => d.status === "REQUESTED").length,
+    ACCEPTED:  donations.filter((d) => d.status === "ACCEPTED").length,
+  };
+
+  const filtered =
+    filter === "ALL"
+      ? donations
+      : donations.filter((d) => d.status === filter);
+
+  // =========================================
+  // RENDER
+  // =========================================
+
   return (
+    <div className="dh-page">
 
-    <div className="donor-history">
-
-      {/* ========================================= */}
-      {/* TITLE */}
-      {/* ========================================= */}
-
-      <h2>
-        📜 Donation History
-      </h2>
-
-      {/* ========================================= */}
-      {/* LOADING */}
-      {/* ========================================= */}
-
-      {loading && (
-
-        <p className="loading-text">
-          Loading donations...
-        </p>
-
-      )}
-
-      {/* ========================================= */}
-      {/* ERROR */}
-      {/* ========================================= */}
-
-      {!loading && error && (
-
-        <p
-          className="error-text"
-          style={{ color: "red" }}
-        >
-          {error}
-        </p>
-
-      )}
-
-      {/* ========================================= */}
-      {/* EMPTY */}
-      {/* ========================================= */}
-
-      {!loading &&
-        !error &&
-        donations.length === 0 && (
-
-        <p className="empty-text">
-          No donations found.
-        </p>
-
-      )}
-
-      {/* ========================================= */}
-      {/* DONATION LIST */}
-      {/* ========================================= */}
-
-      {!loading &&
-        !error &&
-        donations.length > 0 && (
-
-        <div className="history-container">
-
-          {donations.map((donation) => (
-
-            <div
-              className="history-card"
-              key={donation.id}
-            >
-
-              {/* FOOD NAME */}
-              <h3>
-                {donation.foodName ||
-                  "Food Donation"}
-              </h3>
-
-              {/* LOCATION */}
-              <p>
-                <strong>Location:</strong>{" "}
-                {donation.location || "N/A"}
-              </p>
-
-              {/* QUANTITY */}
-              <p>
-                <strong>Quantity:</strong>{" "}
-                {donation.quantity || "N/A"}
-              </p>
-
-              {/* STATUS */}
-              <p>
-
-                <strong>Status:</strong>{" "}
-
-                <span
-                  className={`status ${
-                    donation.status === "ACCEPTED"
-                      ? "status-available"
-                      : donation.status === "REJECTED"
-                      ? "status-donated"
-                      : "status-pending"
-                  }`}
-                >
-                  {donation.status}
-                </span>
-
-              </p>
-
-              {/* DONOR EMAIL */}
-              <p>
-                <strong>Donor Email:</strong>{" "}
-                {donation.donorEmail || "N/A"}
-              </p>
-
-              {/* DONATED DATE */}
-              <p>
-
-                <strong>Donated At:</strong>{" "}
-
-                {donation.donatedAt
-                  ? new Date(
-                      donation.donatedAt
-                    ).toLocaleString()
-                  : "N/A"}
-
-              </p>
-
-            </div>
-
-          ))}
-
+      <div className="dh-hero">
+        <div className="dh-hero-bg" />
+        <div className="dh-hero-content">
+          <div>
+            <span className="dh-hero-eyebrow">Donation Dashboard</span>
+            <h1 className="dh-hero-title">Donation History</h1>
+            <p className="dh-hero-sub">Track your food contributions, monitor status updates, and review details for every donation you've made.</p>
+          </div>
+          <div className="dh-hero-emoji"></div>
         </div>
+      </div>
 
+      {/* ── LOADING ── */}
+      {loading && (
+        <div className="dh-state">
+          <div className="dh-spinner" />
+          <p>Loading your donations...</p>
+        </div>
+      )}
+
+      {/* ── ERROR ── */}
+      {!loading && error && (
+        <div className="dh-state dh-state-error">
+          <div className="dh-state-icon-wrap"></div>
+          <p>{error}</p>
+        </div>
+      )}
+
+      {/* ── EMPTY ── */}
+      {!loading && !error && donations.length === 0 && (
+        <div className="dh-state">
+          <div className="dh-state-icon-wrap"></div>
+          <p>You haven't made any donations yet.</p>
+        </div>
+      )}
+
+      {/* ── TABLE CONTENT ── */}
+      {!loading && !error && donations.length > 0 && (
+        <div className="dh-content">
+          <div className="dh-table-wrapper">
+            <table className="dh-table">
+              <thead>
+                <tr>
+                  <th>Food Name</th>
+                  <th>Location</th>
+                  <th>Quantity</th>
+                  <th>Donated At</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {donations.map((donation) => {
+                  const meta = getStatusMeta(donation.status);
+                  return (
+                    <tr key={donation.id}>
+                      <td className="dh-col-name">
+                        <strong>{donation.foodName || "Food Donation"}</strong>
+                        <span className="dh-col-id">#{donation.id}</span>
+                      </td>
+                      <td>{donation.location || "N/A"}</td>
+                      <td>{donation.quantity || "N/A"}</td>
+                      <td>
+                        {donation.donatedAt
+                          ? new Date(donation.donatedAt).toLocaleString()
+                          : "N/A"}
+                      </td>
+                      <td>
+                        <span className={`dh-badge ${meta.badgeCls}`}>
+                          {meta.label}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
 
     </div>

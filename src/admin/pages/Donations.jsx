@@ -6,27 +6,16 @@ import React, { useEffect, useState } from 'react';
 
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
+import { Package, CircleDot, Timer, CheckCircle2, Trash2 } from 'lucide-react';
 
-// ✅ FIXED IMPORT
 import API from '../../api/axios';
 
 import './Donations.css';
 
 const Donations = () => {
-
-  // =========================================
-  // STATES
-  // =========================================
-
   const [donations, setDonations] = useState([]);
-
   const [loading, setLoading] = useState(true);
-
-  const [error, setError] = useState("");
-
-  // =========================================
-  // FETCH DONATIONS
-  // =========================================
+  const [error, setError] = useState('');
 
   const fetchDonations = async () => {
 
@@ -108,23 +97,31 @@ const Donations = () => {
         }
       );
 
-      alert("Donation deleted successfully");
-
-      // ✅ REFRESH DATA
       fetchDonations();
 
     } catch (error) {
-
-      console.error(
-        "DELETE ERROR:",
-        error.response?.data || error.message
-      );
-
-      alert(
-        error.response?.data?.message ||
-        "Failed to delete donation"
-      );
+      alert(error.response?.data?.message || 'Failed to delete donation');
     }
+  };
+
+  const statusClass = (status) => {
+    switch ((status || '').toLowerCase()) {
+      case 'available':
+        return 'available';
+      case 'requested':
+        return 'requested';
+      case 'accepted':
+        return 'accepted';
+      default:
+        return 'pending';
+    }
+  };
+
+  const counts = {
+    total: donations.length,
+    available: donations.filter((item) => (item.status || '').toLowerCase() === 'available').length,
+    requested: donations.filter((item) => (item.status || '').toLowerCase() === 'requested').length,
+    accepted: donations.filter((item) => (item.status || '').toLowerCase() === 'accepted').length,
   };
 
   return (
@@ -238,11 +235,10 @@ const Donations = () => {
                         <td>
 
                           <button
-                            className="reject-btn"
-                            onClick={() =>
-                              deleteDonation(item.id)
-                            }
+                            className="action-btn delete-btn"
+                            onClick={() => deleteDonation(item.id)}
                           >
+                            <Trash2 size={16} />
                             Delete
                           </button>
 

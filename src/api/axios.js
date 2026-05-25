@@ -14,11 +14,28 @@ const API = axios.create({
 // REQUEST INTERCEPTOR
 // ==========================================
 API.interceptors.request.use(
+
   (req) => {
+
+    // ================= TOKEN =================
     const token = localStorage.getItem("token");
 
+    console.log("🔑 TOKEN FROM LOCALSTORAGE:", token);
+
+    // ================= ATTACH TOKEN =================
     if (token) {
+
       req.headers.Authorization = `Bearer ${token}`;
+
+      console.log(
+        "✅ AUTH HEADER ADDED:",
+        req.headers.Authorization
+      );
+
+    } else {
+
+      console.warn("❌ TOKEN NOT FOUND");
+
     }
 
     console.log(
@@ -27,24 +44,32 @@ API.interceptors.request.use(
 
     return req;
   },
+
   (error) => {
+
     console.error("❌ REQUEST ERROR:", error);
+
     return Promise.reject(error);
   }
+
 );
 
 // ==========================================
 // RESPONSE INTERCEPTOR
 // ==========================================
 API.interceptors.response.use(
+
   (response) => {
+
     console.log(
       `⬅️ API RESPONSE: ${response.config.url} | ${response.status}`
     );
 
     return response;
   },
+
   (error) => {
+
     console.error("❌ API ERROR DETAILS:");
 
     console.log("URL:", error.config?.url);
@@ -53,21 +78,29 @@ API.interceptors.response.use(
     console.log("MESSAGE:", error.message);
 
     // ======================================
-    // AUTH ERROR HANDLING (SAFE VERSION)
+    // AUTH ERROR HANDLING
     // ======================================
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      console.warn("🔐 Auth error detected - clearing session");
+    if (
+      error.response?.status === 401 ||
+      error.response?.status === 403
+    ) {
 
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      localStorage.removeItem("role");
+      console.warn("🔐 AUTH ERROR DETECTED");
 
-      // ❌ NO REDIRECT HERE (important for your receiver issue)
-      // Let React Router handle navigation
+      console.log(
+        "CURRENT TOKEN:",
+        localStorage.getItem("token")
+      );
+
+      // OPTIONAL CLEAR
+      // localStorage.removeItem("token");
+      // localStorage.removeItem("user");
+      // localStorage.removeItem("role");
     }
 
     return Promise.reject(error);
   }
+
 );
 
 export default API;

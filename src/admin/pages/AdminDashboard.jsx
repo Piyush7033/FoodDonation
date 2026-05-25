@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
+import DashboardCard from '../components/DashboardCard';
+import { Users, CheckCircle2, Slash, Package } from 'lucide-react';
 
 import API from '../../api/axios';
 
@@ -25,7 +27,7 @@ const AdminDashboard = () => {
     try {
 
       const token =
-        localStorage.getItem("authToken");
+        localStorage.getItem("token");
 
       console.log("Admin Token:", token);
 
@@ -95,43 +97,33 @@ const AdminDashboard = () => {
           ) : (
 
             <div className="dashboard-cards">
+              <DashboardCard
+                title="Total Users"
+                count={stats.totalUsers}
+                Icon={Users}
+                note="All registered users on the platform"
+              />
 
-              {/* TOTAL USERS */}
-              <div className="dashboard-card">
+              <DashboardCard
+                title="Active Users"
+                count={stats.activeUsers}
+                Icon={CheckCircle2}
+                note="Users currently active"
+              />
 
-                <h2>Total Users</h2>
+              <DashboardCard
+                title="Disabled Users"
+                count={stats.disabledUsers}
+                Icon={Slash}
+                note="Accounts temporarily disabled"
+              />
 
-                <p>{stats.totalUsers}</p>
-
-              </div>
-
-              {/* ACTIVE USERS */}
-              <div className="dashboard-card">
-
-                <h2>Active Users</h2>
-
-                <p>{stats.activeUsers}</p>
-
-              </div>
-
-              {/* DISABLED USERS */}
-              <div className="dashboard-card">
-
-                <h2>Disabled Users</h2>
-
-                <p>{stats.disabledUsers}</p>
-
-              </div>
-
-              {/* TOTAL FOOD */}
-              <div className="dashboard-card">
-
-                <h2>Total Donations</h2>
-
-                <p>{stats.totalFood}</p>
-
-              </div>
-
+              <DashboardCard
+                title="Total Donations"
+                count={stats.totalFood}
+                Icon={Package}
+                note="Food donations tracked"
+              />
             </div>
           )}
 

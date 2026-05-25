@@ -1,155 +1,539 @@
-import React, { useState } from 'react';
-import '../../styles/donor.css';
-import API from '../../api/axios';
+import React, { useState } from "react";
+import API from "../../api/axios";
+import "../../styles/addfood.css";
+
+import {
+  UtensilsCrossed,
+  FileText,
+  Package,
+  MapPin,
+  Clock,
+  PlusCircle,
+  CheckCircle2,
+  AlertTriangle,
+  RotateCcw,
+} from "lucide-react";
+
+// =========================================
+// EMPTY FORM
+// =========================================
+
+const EMPTY = {
+  title: "",
+  description: "",
+  quantity: "",
+  location: "",
+  expiryTime: "",
+};
+
+// =========================================
+// COMPONENT
+// =========================================
 
 const AddFood = () => {
 
-  const [food, setFood] = useState({
-    title: '',
-    description: '',
-    quantity: '',
-    location: '',
-    expiryTime: ''
-  });
+  const [food, setFood] = useState(EMPTY);
 
-  // ================= HANDLE INPUT CHANGE =================
+  const [loading, setLoading] = useState(false);
+
+  const [success, setSuccess] = useState(false);
+
+  const [error, setError] = useState("");
+
+  // =========================================
+  // HANDLE INPUT
+  // =========================================
+
   const handleChange = (e) => {
 
-    setFood({
-      ...food,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+
+    setFood((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  // ================= HANDLE FORM SUBMIT =================
+  // =========================================
+  // HANDLE SUBMIT
+  // =========================================
+
   const handleSubmit = async (e) => {
 
     e.preventDefault();
 
+    setLoading(true);
+
+    setError("");
+
+    setSuccess(false);
+
     try {
 
-      // GET TOKEN
-      const token = localStorage.getItem("authToken");
+      // =====================================
+      // CHECK TOKEN
+      // =====================================
 
-      console.log("Token:", token);
+      const token = localStorage.getItem("token");
 
-      // FIX DATE FORMAT FOR LocalDateTime
+      console.log("🔑 TOKEN => ", token);
+
+      if (!token) {
+
+        setError("Please login first.");
+
+        setLoading(false);
+
+        return;
+      }
+
+      // =====================================
+      // PAYLOAD
+      // =====================================
+
       const payload = {
-        ...food,
+
+        title: food.title,
+
+        description: food.description,
+
+        quantity: food.quantity,
+
+        location: food.location,
+
         expiryTime: food.expiryTime
           ? new Date(food.expiryTime).toISOString()
-          : null
+          : null,
       };
 
-      console.log("Payload:", payload);
+      console.log("📦 PAYLOAD => ", payload);
 
+      // =====================================
       // API CALL
+      // =====================================
+
+      // ❌ NO MANUAL AUTH HEADER
+      // axios interceptor already handles JWT
+
       const response = await API.post(
         "/food",
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+        payload
       );
 
-      console.log("Response:", response.data);
+      console.log("✅ SUCCESS => ", response.data);
 
-      alert("Food Added Successfully ✅");
+      // =====================================
+      // SUCCESS
+      // =====================================
 
-      // OPTIONAL RESET FORM
-      setFood({
-        title: '',
-        description: '',
-        quantity: '',
-        location: '',
-        expiryTime: ''
-      });
+      setSuccess(true);
 
-    } catch (error) {
+      setFood(EMPTY);
 
-      console.error("Add Food Error:", error);
+    } catch (err) {
 
-      if (error.response?.status === 403) {
+      console.error("❌ ADD FOOD ERROR => ", err);
 
-        alert("403 Forbidden: Token missing or invalid ❌");
+      console.log("STATUS => ", err.response?.status);
+
+      console.log("DATA => ", err.response?.data);
+
+      // =====================================
+      // ERROR HANDLING
+      // =====================================
+
+      if (err.response?.status === 401) {
+
+        setError(
+          "Unauthorized. Please login again."
+        );
+
+      } else if (err.response?.status === 403) {
+
+        setError(
+          "Access denied. Only DONOR can add food."
+        );
 
       } else {
 
-        alert(
-          error.response?.data?.message ||
-          "Failed To Add Food ❌"
+        setError(
+          err.response?.data?.message ||
+          err.response?.data ||
+          "Failed to add food donation."
         );
       }
+
+    } finally {
+
+      setLoading(false);
     }
   };
 
+  // =========================================
+  // RENDER
+  // =========================================
+
   return (
 
-    <div className="donor-form-container">
+    <div className="af-page">
 
-      <h2>➕ Add Food Donation</h2>
+      {/* =====================================
+          LEFT PANEL
+      ===================================== */}
 
-      <form
-        onSubmit={handleSubmit}
-        className="donor-form"
-      >
+      <div className="af-left">
 
-        {/* FOOD TITLE */}
-        <input
-          type="text"
-          name="title"
-          placeholder="Food Name"
-          value={food.title}
-          onChange={handleChange}
-          required
-        />
+        <div className="af-left-content">
 
-        {/* DESCRIPTION */}
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={food.description}
-          onChange={handleChange}
-          required
-        />
+          <div className="af-left-icon">
 
-        {/* QUANTITY */}
-        <input
-          type="text"
-          name="quantity"
-          placeholder="Quantity"
-          value={food.quantity}
-          onChange={handleChange}
-          required
-        />
+            <UtensilsCrossed
+              size={48}
+              strokeWidth={1.4}
+            />
 
-        {/* LOCATION */}
-        <input
-          type="text"
-          name="location"
-          placeholder="Location"
-          value={food.location}
-          onChange={handleChange}
-          required
-        />
+          </div>
 
-        {/* EXPIRY TIME */}
-        <input
-          type="datetime-local"
-          name="expiryTime"
-          value={food.expiryTime}
-          onChange={handleChange}
-          required
-        />
+          <h1 className="af-left-title">
 
-        {/* SUBMIT BUTTON */}
-        <button type="submit">
-          Submit Donation
-        </button>
+            Share Food,
+            <br />
+            Share Hope
 
-      </form>
+          </h1>
+
+          <p className="af-left-sub">
+
+            Your donation can feed a family today.
+            Fill in the details and we will connect
+            your food with someone who needs it most.
+
+          </p>
+
+          <div className="af-steps">
+
+            {[
+              {
+                step: "01",
+                text: "Fill in food details",
+              },
+
+              {
+                step: "02",
+                text: "Set pickup location",
+              },
+
+              {
+                step: "03",
+                text: "Submit donation",
+              },
+
+            ].map(({ step, text }) => (
+
+              <div className="af-step" key={step}>
+
+                <span className="af-step-num">
+                  {step}
+                </span>
+
+                <span className="af-step-text">
+                  {text}
+                </span>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* =====================================
+          RIGHT PANEL
+      ===================================== */}
+
+      <div className="af-right">
+
+        <div className="af-form-wrap">
+
+          {/* HEADER */}
+
+          <div className="af-form-header">
+
+            <div className="af-form-header-icon">
+
+              <PlusCircle
+                size={22}
+                strokeWidth={2}
+              />
+
+            </div>
+
+            <div>
+
+              <h2 className="af-form-title">
+                Add Food Donation
+              </h2>
+
+              <p className="af-form-sub">
+                All fields are required
+              </p>
+
+            </div>
+
+          </div>
+
+          {/* SUCCESS */}
+
+          {success && (
+
+            <div className="af-alert af-alert-success">
+
+              <CheckCircle2
+                size={18}
+                strokeWidth={2}
+              />
+
+              <span>
+                Food donation added successfully!
+              </span>
+
+            </div>
+
+          )}
+
+          {/* ERROR */}
+
+          {error && (
+
+            <div className="af-alert af-alert-error">
+
+              <AlertTriangle
+                size={18}
+                strokeWidth={2}
+              />
+
+              <span>{error}</span>
+
+            </div>
+
+          )}
+
+          {/* FORM */}
+
+          <form
+            onSubmit={handleSubmit}
+            className="af-form"
+          >
+
+            {/* TITLE */}
+
+            <div className="af-field">
+
+              <label htmlFor="title">
+
+                <UtensilsCrossed
+                  size={14}
+                  strokeWidth={2}
+                />
+
+                Food Title
+
+              </label>
+
+              <input
+                id="title"
+                type="text"
+                name="title"
+                value={food.title}
+                onChange={handleChange}
+                placeholder="e.g. Rice and Curry"
+                required
+              />
+
+            </div>
+
+            {/* DESCRIPTION */}
+
+            <div className="af-field">
+
+              <label htmlFor="description">
+
+                <FileText
+                  size={14}
+                  strokeWidth={2}
+                />
+
+                Description
+
+              </label>
+
+              <textarea
+                id="description"
+                name="description"
+                value={food.description}
+                onChange={handleChange}
+                placeholder="Describe the food..."
+                rows={3}
+                required
+              />
+
+            </div>
+
+            {/* ROW */}
+
+            <div className="af-field-row">
+
+              {/* QUANTITY */}
+
+              <div className="af-field">
+
+                <label htmlFor="quantity">
+
+                  <Package
+                    size={14}
+                    strokeWidth={2}
+                  />
+
+                  Quantity
+
+                </label>
+
+                <input
+                  id="quantity"
+                  type="text"
+                  name="quantity"
+                  value={food.quantity}
+                  onChange={handleChange}
+                  placeholder="e.g. 10 plates"
+                  required
+                />
+
+              </div>
+
+              {/* LOCATION */}
+
+              <div className="af-field">
+
+                <label htmlFor="location">
+
+                  <MapPin
+                    size={14}
+                    strokeWidth={2}
+                  />
+
+                  Pickup Location
+
+                </label>
+
+                <input
+                  id="location"
+                  type="text"
+                  name="location"
+                  value={food.location}
+                  onChange={handleChange}
+                  placeholder="e.g. Main Street"
+                  required
+                />
+
+              </div>
+
+            </div>
+
+            {/* EXPIRY */}
+
+            <div className="af-field">
+
+              <label htmlFor="expiryTime">
+
+                <Clock
+                  size={14}
+                  strokeWidth={2}
+                />
+
+                Expiry Date & Time
+
+              </label>
+
+              <input
+                id="expiryTime"
+                type="datetime-local"
+                name="expiryTime"
+                value={food.expiryTime}
+                onChange={handleChange}
+                required
+              />
+
+            </div>
+
+            {/* ACTIONS */}
+
+            <div className="af-actions">
+
+              {/* RESET */}
+
+              <button
+                type="button"
+                className="af-btn af-btn-reset"
+                onClick={() => {
+
+                  setFood(EMPTY);
+
+                  setSuccess(false);
+
+                  setError("");
+
+                }}
+              >
+
+                <RotateCcw
+                  size={15}
+                  strokeWidth={2}
+                />
+
+                Reset
+
+              </button>
+
+              {/* SUBMIT */}
+
+              <button
+                type="submit"
+                className="af-btn af-btn-submit"
+                disabled={loading}
+              >
+
+                {loading ? (
+
+                  <>
+                    <span className="af-spinner" />
+                    Submitting...
+                  </>
+
+                ) : (
+
+                  <>
+                    <PlusCircle
+                      size={16}
+                      strokeWidth={2}
+                    />
+
+                    Submit Donation
+                  </>
+
+                )}
+
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
 
     </div>
   );

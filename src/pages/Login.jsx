@@ -21,6 +21,7 @@ const Login = () => {
 
   // ================= VALIDATION =================
   const validateForm = () => {
+
     const newErrors = {};
 
     if (!formData.email) {
@@ -40,6 +41,7 @@ const Login = () => {
 
   // ================= HANDLE CHANGE =================
   const handleChange = (e) => {
+
     const { name, value } = e.target;
 
     setFormData((prev) => ({
@@ -47,6 +49,7 @@ const Login = () => {
       [name]: value
     }));
 
+    // clear errors
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -57,6 +60,7 @@ const Login = () => {
 
   // ================= HANDLE LOGIN =================
   const handleSubmit = async (e) => {
+
     e.preventDefault();
 
     const validationErrors = validateForm();
@@ -66,9 +70,9 @@ const Login = () => {
       return;
     }
 
-    // ⭐ OPTIONAL: force role selection (you can remove if backend handles it)
+    // role check
     if (!selectedRole) {
-      alert("Please select a role (Donor or Receiver)");
+      alert("Please select a role");
       return;
     }
 
@@ -76,48 +80,68 @@ const Login = () => {
 
     try {
 
+      // ================= LOGIN API =================
       const response = await loginUser({
         email: formData.email,
         password: formData.password
       });
 
+      console.log("FULL LOGIN RESPONSE:", response);
+
+      // ================= TOKEN EXTRACTION =================
       const token =
         response?.token ||
         response?.data?.token ||
         response?.jwt ||
-        response?.accessToken;
+        response?.data?.jwt ||
+        response?.accessToken ||
+        response?.data?.accessToken;
 
+      // ================= USER EXTRACTION =================
       const user =
         response?.user ||
         response?.data?.user ||
         response?.data;
 
+      // ================= ROLE EXTRACTION =================
       const backendRole =
-        (response?.role ||
+        (
+          response?.role ||
           response?.data?.role ||
           user?.role ||
-          "").toUpperCase();
+          selectedRole
+        ).toUpperCase();
 
-      if (!token || !user) {
-        alert('Invalid server response');
+      // ================= VALIDATION =================
+      if (!token) {
+        alert("JWT Token not received from backend ❌");
+        console.log("Token Missing");
         return;
       }
 
-      login(user, token);
+      if (!user) {
+        alert("User data missing ❌");
+        console.log("User Missing");
+        return;
+      }
 
+      // ================= SAVE DATA =================
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-      console.log("Login Successful:", { user, token, backendRole });
+      localStorage.setItem("role", backendRole);
 
-      // ⭐ FINAL ROLE DECISION (Backend priority)
-      const role = (backendRole || selectedRole).toUpperCase();
+      // ================= DEBUG =================
+      console.log("TOKEN SAVED:", localStorage.getItem("token"));
+      console.log("USER SAVED:", localStorage.getItem("user"));
+      console.log("ROLE SAVED:", localStorage.getItem("role"));
 
-      localStorage.setItem("role", role);
+      // ================= CONTEXT LOGIN =================
+      login(user, token);
 
-      alert(`Login Successful as ${role} ✅`);
+      alert(`Login Successful as ${backendRole} ✅`);
 
-      // ================= ROLE BASED REDIRECT =================
-      switch (role) {
+      // ================= ROLE REDIRECT =================
+      switch (backendRole) {
 
         case "DONOR":
           navigate('/donor/dashboard', { replace: true });
@@ -136,25 +160,46 @@ const Login = () => {
       }
 
     } catch (error) {
+
+      console.log("LOGIN ERROR:", error);
+
       alert(
         error?.response?.data?.message ||
+        error?.response?.data ||
         error?.message ||
         'Login Failed ❌'
       );
+
     } finally {
+
       setLoading(false);
+
     }
   };
 
   return (
+
     <div className="auth-container">
 
       {/* LEFT SIDE */}
       <div className="login-left">
+
         <div className="left-content">
-          <h1>Share Food, Spread Humanity ❤️</h1>
-          <p>Join our Food Donation System and help reduce hunger.</p>
+
+          <span className="auth-badge">
+            Safe, secure login
+          </span>
+
+          <h1>
+            Share Food, Spread Humanity ❤️
+          </h1>
+
+          <p>
+            Join our Food Donation System and help reduce hunger.
+          </p>
+
         </div>
+
       </div>
 
       {/* RIGHT SIDE */}
@@ -162,14 +207,17 @@ const Login = () => {
 
         <div className="auth-card">
 
-          <h2>Welcome Back 👋</h2>
-          <p>Login to continue</p>
+          <h2 className="auth-title">
+            Welcome Back
+          </h2>
 
           <form onSubmit={handleSubmit}>
 
             {/* EMAIL */}
             <div className="form-group">
+
               <label>Email</label>
+
               <input
                 type="email"
                 name="email"
@@ -177,12 +225,21 @@ const Login = () => {
                 onChange={handleChange}
                 className={errors.email ? 'input-error' : ''}
               />
-              {errors.email && <span className="error-text">{errors.email}</span>}
+
+              {
+                errors.email &&
+                <span className="error-text">
+                  {errors.email}
+                </span>
+              }
+
             </div>
 
             {/* PASSWORD */}
             <div className="form-group">
+
               <label>Password</label>
+
               <input
                 type="password"
                 name="password"
@@ -190,18 +247,32 @@ const Login = () => {
                 onChange={handleChange}
                 className={errors.password ? 'input-error' : ''}
               />
-              {errors.password && <span className="error-text">{errors.password}</span>}
+
+              {
+                errors.password &&
+                <span className="error-text">
+                  {errors.password}
+                </span>
+              }
+
             </div>
 
-            {/* ROLE SELECTION */}
-            <div className="form-group">
-              <label>Choose Role</label>
+            {/* ROLE */}
+            <div className="role-selector">
+
+              <p className="role-title">
+                Choose Role
+              </p>
 
               <div className="role-buttons">
 
                 <button
                   type="button"
-                  className={selectedRole === "DONOR" ? "role-btn active donor" : "role-btn"}
+                  className={
+                    selectedRole === "DONOR"
+                      ? "role-btn active donor"
+                      : "role-btn"
+                  }
                   onClick={() => setSelectedRole("DONOR")}
                 >
                   DONOR
@@ -209,28 +280,48 @@ const Login = () => {
 
                 <button
                   type="button"
-                  className={selectedRole === "RECEIVER" ? "role-btn active receiver" : "role-btn"}
+                  className={
+                    selectedRole === "RECEIVER"
+                      ? "role-btn active receiver"
+                      : "role-btn"
+                  }
                   onClick={() => setSelectedRole("RECEIVER")}
                 >
                   RECEIVER
                 </button>
 
               </div>
+
             </div>
 
-            <button className="auth-btn" disabled={loading}>
-              {loading ? 'Logging in...' : 'Login'}
+            {/* LOGIN BUTTON */}
+            <button
+              className="auth-btn"
+              disabled={loading}
+            >
+              {
+                loading
+                  ? 'Logging in...'
+                  : 'Login'
+              }
             </button>
 
           </form>
 
           <p className="auth-link">
-            Don't have an account? <Link to="/register">Register</Link>
+
+            Don't have an account?
+
+            <Link to="/register">
+              Register
+            </Link>
+
           </p>
 
         </div>
 
       </div>
+
     </div>
   );
 };
